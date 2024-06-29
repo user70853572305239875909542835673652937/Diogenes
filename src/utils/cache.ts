@@ -3,7 +3,7 @@ export interface Episode {
     epNum: number;
     embed: string;
     m3u8: string | null;
-    resolutions: { url: string, label: string }[] | null;
+    resolutions: { file: string, label: string }[] | null;
     downloadUrl: string | null;
 }
 

@@ -8,7 +8,7 @@ interface Episode {
     epNum: number;
     embed: string;
     m3u8: string | null;
-    resolutions: { url: string, label: string }[] | null;
+    resolutions: { file: string, label: string }[] | null;
     downloadUrl: string | null;
 }
 
@@ -40,10 +40,10 @@ const fetchEpisode = async (gogoId: string, epNum: number): Promise<Episode[]> =
 
             if (embed) {
                 const { m3u8, resolutions, downloadUrl } = await fetchM3U8(embed);
-                const formattedResolutions = resolutions?.map(url => {
-                    const resMatch = url.match(/(\d+)\.m3u8$/);
+                const formattedResolutions = resolutions?.map(file => {
+                    const resMatch = file.match(/(\d+)\.m3u8$/);
                     const resLabel = resMatch && resolutionLabels[resMatch[1]] ? resolutionLabels[resMatch[1]] : 'unknown';
-                    return { url, label: resLabel };
+                    return { file, label: resLabel };
                 }) || null;
 
                 const episode: Episode = {
@@ -58,7 +58,7 @@ const fetchEpisode = async (gogoId: string, epNum: number): Promise<Episode[]> =
                 cache.set(epKey, episode);
                 console.log(`\nEpisode ${epNum} embed: ${embed}`);
                 console.log(`Episode ${epNum} m3u8: ${m3u8}`);
-                console.log(`Episode ${epNum} resolutions: ${formattedResolutions?.map(r => `${r.label}: ${r.url}`).join(', ')}`);
+                console.log(`Episode ${epNum} resolutions: ${formattedResolutions?.map(r => `${r.label}: ${r.file}`).join(', ')}`);
                 console.log(`Episode ${epNum} mp4 download URL: ${downloadUrl}\n`);
             } else {
                 console.log(`embed link not found for episode ${epNum}`);

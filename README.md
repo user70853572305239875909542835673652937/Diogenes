@@ -72,19 +72,19 @@ curl "http://localhost:5173/episodes?gogoId=one-piece&ep=1109&dub=false"
       "m3u8": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.m3u8",
       "resolutions": [
         {
-          "url": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.360.m3u8",
+          "file": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.360.m3u8",
           "label": "360p"
         },
         {
-          "url": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.480.m3u8",
+          "file": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.480.m3u8",
           "label": "480p"
         },
         {
-          "url": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.720.m3u8",
+          "file": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.720.m3u8",
           "label": "720p"
         },
         {
-          "url": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.1080.m3u8",
+          "file": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.1080.m3u8",
           "label": "1080p"
         }
       ],

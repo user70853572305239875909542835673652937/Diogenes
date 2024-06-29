@@ -1,0 +1,35 @@
+{
+  "name": "gogo-scraper",
+  "module": "src/app.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/app.ts",
+    "dev": "bun run --watch src/app.ts",
+    "lint": "eslint 'src/**/*.ts'"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/cheerio": "^0.22.35",
+    "@types/crypto-js": "^4.2.2",
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.9",
+    "@types/prompt-sync": "^4.2.3",
+    "@types/puppeteer": "^7.0.4",
+    "eslint": "9.6.0",
+    "eslint-plugin-import": "^2.29.1",
+    "typescript": "^5.5.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.5.2"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "cheerio": "^1.0.0-rc.12",
+    "chrome-paths": "^1.0.1",
+    "express": "^4.19.2",
+    "lint": "^0.8.19",
+    "puppeteer": "^22.12.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

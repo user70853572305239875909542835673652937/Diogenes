@@ -1,26 +1,21 @@
 import express from 'express';
-import fetchEpisode from '../services/fetchEpisode';
+import processEpisode from '../services/processEpisode';
 
 const router = express.Router();
 
-router.get('/episodes', async (req, res) => {
-    let gogoId = req.query.gogoId as string;
-    const epNum = parseInt(req.query.ep as string, 10);
-    const isDub = req.query.dub === 'true';
+router.get('/', async (req, res) => {
+    const { id, ep } = req.query;
 
-    if (!gogoId || isNaN(epNum)) {
-        return res.status(400).json({ error: 'Invalid query parameters' });
+    if (!id || !ep) {
+        return res.status(400).send('Missing id or episode number');
     }
 
-    // Modify gogoId if isDub is true
-    const modifiedGogoId = isDub ? `${gogoId}-dub` : gogoId;
-
     try {
-        const episodes = await fetchEpisode(modifiedGogoId, epNum);
-        res.json({ gogoId: modifiedGogoId, episodes });
+        const episode = await processEpisode(id as string, parseInt(ep as string));
+        res.json({ id, ep, episode });
     } catch (error) {
-        console.error(`[ERROR] Failed to fetch episodes:`, error);
-        res.status(500).json({ error: 'Failed to fetch episodes' });
+        console.error(error);
+        res.status(500).send('An error occurred while fetching the episode data');
     }
 });
 

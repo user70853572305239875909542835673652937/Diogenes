@@ -5,7 +5,13 @@ import fetchResolutions from './fetchResolutions';
 
 puppeteer.use(stealth());
 
-const fetchM3U8 = async (iframeUrl: string): Promise<{ m3u8: string | null, resolutions: string[] | null, downloadUrl: string | null }> => {
+export interface FetchM3U8Result {
+    m3u8: string | null;
+    resolutions: string[] | null;
+    downloadUrl: string | null;
+}
+
+const fetchM3U8 = async (iframeUrl: string): Promise<FetchM3U8Result> => {
     const browser = await puppeteer.launch({
         headless: true,
         executablePath: chrome,
@@ -53,7 +59,6 @@ const fetchM3U8 = async (iframeUrl: string): Promise<{ m3u8: string | null, reso
         }
     });
 
-    // Wait for the video to start playing
     await page.waitForFunction(() => {
         const videoElement = document.querySelector('video');
         return videoElement && !videoElement.paused;
@@ -61,7 +66,6 @@ const fetchM3U8 = async (iframeUrl: string): Promise<{ m3u8: string | null, reso
 
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    // Extract the download URL from the `embed`
     downloadUrl = await page.evaluate(() => {
         const iframe = document.querySelector('iframe');
         if (iframe) {

@@ -1,11 +1,13 @@
 import express from 'express';
+import mappingsRouter from './routes/mappings';
 import episodesRouter from './routes/episodes';
 import os from 'os';
 
 const app = express();
 const port = process.env.PORT || 5173;
 
-app.use('/', episodesRouter);
+app.use('/mappings', mappingsRouter);
+app.use('/episodes', episodesRouter);
 
 app.listen(port, () => {
     const localIP = '127.0.0.1';

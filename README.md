@@ -18,7 +18,8 @@
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
   - [Fetch Mappings](#fetch-mappings)
-  - [Fetch Episode Information](#fetch-episode-information)
+  - [Fetch Info](#fetch-anime-info)
+  - [Fetch Episode Sources](#fetch-episode-sources)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 
@@ -51,7 +52,7 @@
    bun start
    ```
 
-2. The server will run on port `5173` by default. You can access the API at `http://localhost:5173/episodes`.
+2. The server will run on port `8080` by default. You can access the API at `http://localhost:8080/episodes`.
 
 ## API Endpoints
 
@@ -60,12 +61,12 @@
 - **Endpoint:** `/mappings`
 - **Method:** `GET`
 - **Query Parameters:**
-  - `id` (number): The ID of the anime.
+  - `id` (number): The ID of the anime on AniList.
 
 #### Example Request
 
 ```bash
-curl "http://localhost:5173/mappings?id=21"
+curl "http://localhost:8080/mappings?id=21"
 ```
 
 #### Example Response
@@ -163,7 +164,108 @@ curl "http://localhost:5173/mappings?id=21"
 }
 ```
 
-### Fetch Episode Information
+### Fetch Anime Info
+
+- **Endpoint:** `/info`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `id` (string): The ID of the anime on AniList.
+
+#### Example Request
+
+```bash
+curl "http://localhost:8080/info?id=21"
+```
+
+#### Example Response
+
+```json
+{
+  "id": 21,
+  "title": {
+    "userPreferred": "ONE PIECE",
+    "romaji": "ONE PIECE",
+    "english": "ONE PIECE",
+    "native": "ONE PIECE"
+  },
+  "coverImage": {
+    "extraLarge": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/bx21-YCDoj1EkAxFn.jpg",
+    "large": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21-YCDoj1EkAxFn.jpg",
+    "medium": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/small/bx21-YCDoj1EkAxFn.jpg",
+    "color": "#e49335"
+  },
+  "bannerImage": "https://s4.anilist.co/file/anilistcdn/media/anime/banner/21-wf37VakJmZqs.jpg",
+  "startDate": {
+    "year": 1999,
+    "month": 10,
+    "day": 20
+  },
+  "endDate": {
+    "year": null,
+    "month": null,
+    "day": null
+  },
+  "description": "Gold Roger was known as the Pirate King...",
+  "season": "FALL",
+  "seasonYear": 1999,
+  "type": "ANIME",
+  "format": "TV",
+  "status": "RELEASING",
+  "episodes": null,
+  "duration": 24,
+  "chapters": null,
+  "volumes": null,
+  "genres": [
+    "Action",
+    "Adventure",
+    "Comedy",
+    "Drama",
+    "Fantasy"
+  ],
+  "synonyms": [
+    "ワンピース",
+    "海贼王",
+    "וואן פיס",
+    "ون بيس",
+    "วันพีซ",
+    "Vua Hải Tặc",
+    "All'arrembaggio!",
+    "Tutti all'arrembaggio!",
+    "Ντρέηκ, το Κυνήγι του Θησαυρού"
+  ],
+  "source": "MANGA",
+  "isAdult": false,
+  "meanScore": 88,
+  "averageScore": 88,
+  "popularity": 529240,
+  "favourites": 77126,
+  "hashtag": "#ONEPIECE",
+  "countryOfOrigin": "JP",
+  "isLicensed": true,
+  "isFavourite": false,
+  "nextAiringEpisode": {
+    "airingAt": 1720312200,
+    "timeUntilAiring": 591333,
+    "episode": 1111
+  },
+  "streamingEpisodes": [
+    {
+      "title": "Episode 130 - Scent of Danger! the Seventh Member Is Nico Robin!",
+      "thumbnail": "https://img1.ak.crunchyroll.com/i/spire4-tmb/d80b3fbce742e6deb4d2caf37d08ca6e1395451246_full.jpg"
+    },
+    ...
+  ],
+  "tags": [
+    {
+      "name": "Pirates",
+      "description": "Prominently features sea-faring adventurers branded as criminals by the law."
+    },
+    ...
+  ]
+}
+```
+
+### Fetch Episode Sources
 
 - **Endpoint:** `/episodes`
 - **Method:** `GET`
@@ -174,7 +276,7 @@ curl "http://localhost:5173/mappings?id=21"
 #### Example Request
 
 ```bash
-curl "http://localhost:5173/episodes?id=one-piece&ep=1109"
+curl "http://localhost:8080/episodes?id=one-piece&ep=1109"
 ```
 
 #### Example Response
@@ -183,31 +285,15 @@ curl "http://localhost:5173/episodes?id=one-piece&ep=1109"
 {
   "id": "one-piece",
   "ep": "1109",
-  "episode": {
-    "id": "one-piece-episode-1109",
-    "number": 1109,
-    "embed": "https://s3taku.com/streaming.php?id=MjI3MjUx&title=One+Piece+Episode+1109",
-    "m3u8": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.m3u8",
-    "resolutions": [
-      {
-        "url": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.360.m3u8",
-        "label": "360p"
-      },
-      {
-        "url": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.480.m3u8",
-        "label": "480p"
-      },
-      {
-        "url": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.720.m3u8",
-        "label": "720p"
-      },
-      {
-        "url": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.1080.m3u8",
-        "label": "1080p"
-      }
-    ],
-    "downloadUrl": "https://s3taku.com/download?id=MjI3MjUx"
-  }
+  "episode": [
+    {
+      "id": "one-piece-episode-1109",
+      "number": 1109,
+      "embed": "https://s3taku.com/streaming.php?id=MjI3MjUx&title=One+Piece+Episode+1109",
+      "m3u8": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.m3u8",
+      "downloadUrl": "https://s3taku.com/download?id=MjI3MjUx"
+    }
+  ]
 }
 ```
 
@@ -219,13 +305,19 @@ gogo-scraper/
 ├── src/
 │   ├── routes/
 │   │   ├── episodes.ts
+│   │   ├── info.ts
 │   │   └── mappings.ts
+│   ├── providers/
+│   │   ├── gogoanime/
+│   │   │   ├── fetchEpisode.ts
+│   │   │   ├── fetchM3U8.ts
+│   │   │   └── processEpisode.ts
+│   │   ├── anilist/
+│   │   │   └── fetchInfo.ts
+│   │   └── malsync/
+│   │       └── fetchMappings.ts
 │   ├── services/
-│   │   ├── fetchData.ts
-│   │   ├── fetchEpisode.ts
-│   │   ├── fetchM3U8.ts
-│   │   ├── fetchMappings.ts
-│   │   └── processEpisode.ts
+│   │   └── fetchData.ts
 │   ├── utils/
 │   │   └── cache.ts
 │   └── app.ts
@@ -240,10 +332,12 @@ gogo-scraper/
 
 - **`routes/episodes.ts`**: Defines the route for fetching episode information.
 - **`routes/mappings.ts`**: Defines the route for fetching mappings information.
-- **`services/fetchEpisode.ts`**: Implements logic to retrieve episode details from the website.
-- **`services/fetchM3U8.ts`**: Handles fetching m3u8 links and resolutions.
-- **`services/fetchResolutions.ts`**: Manages the retrieval of different video resolutions.
-- **`utils/cache.ts`**: Provides caching mechanism for storing episode data.
+- **`routes/info.ts`**: Defines the route for fetching anime information from AniList.
+- **`providers/gogoanime/`**: Contains modules related to fetching data from Gogoanime.
+- **`providers/anilist/`**: Contains modules related to fetching data from AniList.
+- **`providers/malsync/`**: Contains modules related to fetching data from Malsync.
+- **`services/fetchData.ts`**: Implements common data fetching logic.
+- **`utils/cache.ts`**: Provides caching mechanism for storing data.
 - **`app.ts`**: Initializes the Express.js server and includes route handlers.
 
 ## Contributing

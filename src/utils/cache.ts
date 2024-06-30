@@ -1,16 +1,15 @@
-interface Episode {
-    id: string;
-    number: number;
-    embed: string;
-    m3u8: string | null;
-    resolutions: { url: string, label: string }[] | null;
-    downloadUrl: string | null;
+interface Cache<T> {
+    has: (key: string) => boolean;
+    get: (key: string) => T | undefined;
+    set: (key: string, value: T) => void;
 }
 
-const cache = new Map<string, Episode>();
+const cacheMap = new Map<string, any>();
 
-export default {
-    has: (key: string) => cache.has(key),
-    get: (key: string) => cache.get(key),
-    set: (key: string, value: Episode) => cache.set(key, value),
-};
+const createCache = <T>(): Cache<T> => ({
+    has: (key: string) => cacheMap.has(key),
+    get: (key: string) => cacheMap.get(key),
+    set: (key: string, value: T) => cacheMap.set(key, value)
+});
+
+export default createCache;

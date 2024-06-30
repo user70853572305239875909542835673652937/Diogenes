@@ -30,6 +30,7 @@
     "lint": "^0.8.19",
     "puppeteer": "^22.12.1",
     "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "winston": "^3.13.0"
   }
 }

@@ -1,5 +1,5 @@
 import express from 'express';
-import fetchMappings from '../providers/malsync/fetchMappings';
+import fetchInfo from '../providers/anilist/fetchInfo';
 
 const router = express.Router();
 
@@ -11,14 +11,14 @@ router.get('/', async (req, res) => {
     }
 
     try {
-        const data = await fetchMappings(id as string);
+        const data = await fetchInfo(id as string);
         if (!data) {
-            return res.status(404).send('Sites not found for the given ID');
+            return res.status(404).send('Anime not found');
         }
         res.json(data);
     } catch (error) {
         console.error(error);
-        res.status(500).send('An error occurred while fetching the mappings');
+        res.status(500).send('An error occurred while fetching anime information');
     }
 });
 

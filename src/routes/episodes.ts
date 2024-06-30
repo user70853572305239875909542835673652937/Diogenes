@@ -1,5 +1,5 @@
 import express from 'express';
-import processEpisode from '../services/processEpisode';
+import processEpisode from '../providers/gogoanime/processEpisode';
 
 const router = express.Router();
 

@@ -1,4 +1,6 @@
-import { fetchData } from './fetchData';
+import { fetchData } from "../../services/fetchData";
+import { cache } from '../../utils/cacheSetup';
+
 
 interface SiteInfo {
     identifier: string;
@@ -29,8 +31,25 @@ interface MappingResponse {
 }
 
 const fetchMappings = async (id: string): Promise<MappingResponse | null> => {
+    const cacheKey = `mappings-${id}`;
+
+    if (cache.has(cacheKey)) {
+        console.log(`Fetching mappings for id ${id} from cache`);
+        return cache.get(cacheKey) ?? null;
+    }
+
     const url = `https://api.malsync.moe/mal/anime/anilist:${id}`;
-    return await fetchData(url).then(data => data ?? null);
+    try {
+        const data = await fetchData(url);
+        if (data !== undefined) {
+            cache.set(cacheKey, data);
+            return data;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching mappings:', error);
+        return null;
+    }
 };
 
 export default fetchMappings;

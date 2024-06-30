@@ -1,13 +1,11 @@
 import puppeteer from 'puppeteer-extra';
 import stealth from 'puppeteer-extra-plugin-stealth';
 import { chrome } from 'chrome-paths';
-import fetchResolutions from './fetchResolutions';
 
 puppeteer.use(stealth());
 
 export interface FetchM3U8Result {
     m3u8: string | null;
-    resolutions: string[] | null;
     downloadUrl: string | null;
 }
 
@@ -28,7 +26,6 @@ const fetchM3U8 = async (iframeUrl: string): Promise<FetchM3U8Result> => {
     });
 
     let m3u8: string | null = null;
-    let resolutions: string[] | null = null;
     let downloadUrl: string | null = null;
     let foundPrimaryM3U8 = false;
 
@@ -42,7 +39,6 @@ const fetchM3U8 = async (iframeUrl: string): Promise<FetchM3U8Result> => {
             console.log(`M3U8 URL: ${request.url}`);
             m3u8 = request.url;
             if (m3u8) {
-                resolutions = await fetchResolutions(m3u8);
                 foundPrimaryM3U8 = true;
             }
         }
@@ -77,7 +73,7 @@ const fetchM3U8 = async (iframeUrl: string): Promise<FetchM3U8Result> => {
     });
 
     await browser.close();
-    return { m3u8, resolutions, downloadUrl };
+    return { m3u8, downloadUrl };
 };
 
 export default fetchM3U8;

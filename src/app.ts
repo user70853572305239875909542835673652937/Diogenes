@@ -1,11 +1,28 @@
 import express from 'express';
+import infoRouter from './routes/info';
 import mappingsRouter from './routes/mappings';
 import episodesRouter from './routes/episodes';
 import os from 'os';
+import winston from 'winston';
+
+// Create a Winston logger instance
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp({
+            format: 'YYYY-MM-DD HH:mm:ss'
+        }),
+        winston.format.printf(({ timestamp, level, message }) => `${timestamp} [${level.toUpperCase()}]: ${message}`)
+    ),
+    transports: [
+        new winston.transports.Console(),
+    ]
+});
 
 const app = express();
-const port = process.env.PORT || 5173;
+const port = process.env.PORT || 8080;
 
+app.use('/info', infoRouter);
 app.use('/mappings', mappingsRouter);
 app.use('/episodes', episodesRouter);
 
@@ -27,9 +44,9 @@ app.listen(port, () => {
         if (lanIP) break;
     }
 
-    console.log(`[INFO] Server running on port ${port}`);
-    console.log(`Local: http://localhost:${port}`);
+    logger.info(`Server running on port ${port}`);
+    logger.info(`Local: http://localhost:${port}`);
     if (lanIP) {
-        console.log(`LAN: http://${lanIP}:${port}`);
+        logger.info(`LAN: http://${lanIP}:${port}`);
     }
 });

@@ -1,4 +1,4 @@
-# ![jerry](https://cdn.discordapp.com/emojis/1253722954504863844.webp?size=22&quality=lossless) Gogo Scraper Dude
+# ![jerry](https://cdn.discordapp.com/emojis/1253722954504863844.webp?size=28&quality=lossless) Gogo Scraper Dude
 
 <img src="https://i.pinimg.com/564x/32/8b/3c/328b3cc06b7863db5c790883e5df49fa.jpg" align="right" width="80" />
 

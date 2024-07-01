@@ -23,6 +23,7 @@
     "typescript": "^5.5.2"
   },
   "dependencies": {
+    "@types/axios": "^0.14.0",
     "axios": "^1.7.2",
     "cheerio": "^1.0.0-rc.12",
     "chrome-paths": "^1.0.1",

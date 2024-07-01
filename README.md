@@ -6,8 +6,8 @@
 
 ## Features
 
-- Retrieves episode details such as **embeds**, **m3u8 links**, resolutions, and **mp4 download URLs**.
-- Supports **dubbed episodes** by appending `-dub` to the anime ID.
+- Retrieves episode details such as **embeds**, **m3u8 links**, and **mp4 download URLs**.
+- Supports **dubbed episodes**.
 - Implements **caching** to enhance performance.
 - **Modularized codebase** for easy maintenance.
 
@@ -52,7 +52,7 @@
    bun start
    ```
 
-2. The server will run on port `8080` by default. You can access the API at `http://localhost:8080/episodes`.
+2. The server will run on port `8080` by default. You can access the API at `http://localhost:8080/`.
 
 ## API Endpoints
 
@@ -267,60 +267,77 @@ curl "http://localhost:8080/info?id=21"
 
 ### Fetch Episode Sources
 
-- **Endpoint:** `/episodes`
+- **Endpoint:** `/sources`
 - **Method:** `GET`
 - **Query Parameters:**
   - `id` (string): The ID of the anime.
   - `ep` (number): The episode number.
+  - `provider` (string): The provider name, e.g., 'gogoanime', '9anime', 'zoro'.
 
 #### Example Request
 
 ```bash
-curl "http://localhost:8080/episodes?id=one-piece&ep=1109"
+curl "http://localhost:8080/sources?id=one-piece&ep=1&provider=gogoanime"
 ```
 
 #### Example Response
 
 ```json
 {
-  "id": "one-piece",
-  "ep": "1109",
-  "episode": [
-    {
-      "id": "one-piece-episode-1109",
-      "number": 1109,
-      "embed": "https://s3taku.com/streaming.php?id=MjI3MjUx&title=One+Piece+Episode+1109",
-      "m3u8": "https://www111.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.1109.1719110413.m3u8",
-      "downloadUrl": "https://s3taku.com/download?id=MjI3MjUx"
+  "provider": "gogoanime",
+  "episodeId": "one-piece-episode-19",
+  "downloadUrl": "https://s3taku.com/download?id=MzU4Nw==",
+  "sources": {
+    "Vidstreaming": {
+      "embed": "https://s3taku.com/streaming.php?id=MzU4Nw==&title=One+Piece+Episode+19",
+      "m3u8": "https://www034.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.19.1709230009.m3u8"
+    },
+    "Gogo server": {
+      "embed": "https://s3taku.com/embedplus?id=MzU4Nw==&token=VuVqmBxzsUHOqajjwbcCNA&expires=1719821343",
+      "m3u8": "https://www034.vipanicdn.net/streamhls/0b594d900f47daabc194844092384914/ep.19.1709230009.m3u8"
+    },
+    "Streamwish": {
+      "embed": "https://awish.pro/e/y0m0th7fkabn",
+      "m3u8": "https://eb7jhj2czt.sw-cdnstreamwish.com/hls2/01/00985/y0m0th7fkabn_o/master.m3u8?t=urBSk-N3CwBnZPYKN9PD1nCmfo9Y3jWu7VmkHzmRsNc&s=1719814151&e=129600&f=4926294&srv=rlaj2blvduli&i=0.0&sp=500&p1=rlaj2blvduli&p2=rlaj2blvduli&asn=3352"
+    },
+    "Doodstream": {
+      "embed": "https://dood.wf/e/aqk2elyf0i0u",
+      "m3u8": null
+    },
+    "Vidhide": {
+      "embed": "https://alions.pro/v/th97329evri0",
+      "m3u8": "https://dd2stliwt0bc.aghe-cdn.com/hls2/01/00346/th97329evri0_o/master.m3u8?t=qj1J7Cm59jvd8fTzP6TfExuMKoD7RFR7mnIYglH5slU&s=1719814153&e=129600&f=1732061&srv=dRbzRpT7gMoa&i=0.4&sp=500&p1=dRbzRpT7gMoa&p2=dRbzRpT7gMoa&asn=3352"
     }
-  ]
+  }
 }
 ```
 
 ## Project Structure
 
-```
+```plaintext
 gogo-scraper/
 │
 ├── src/
 │   ├── routes/
-│   │   ├── episodes.ts
+│   │   ├── sources.ts
 │   │   ├── info.ts
 │   │   └── mappings.ts
 │   ├── providers/
 │   │   ├── gogoanime/
-│   │   │   ├── fetchEpisode.ts
 │   │   │   ├── fetchM3U8.ts
-│   │   │   └── processEpisode.ts
+│   │   │   └── fetchSources.ts
 │   │   ├── anilist/
-│   │   │   └── fetchInfo.ts
-│   │   └── malsync/
+│   │   │   ├── fetchInfo.ts
+│   │   │   └── queries.ts
+│   │   ├── malsync/
 │   │       └── fetchMappings.ts
 │   ├── services/
 │   │   └── fetchData.ts
 │   ├── utils/
+│   │   ├── cacheSetup.ts
 │   │   └── cache.ts
-│   └── app.ts
+│   ├── app.ts
+│   └── index.ts
 │
 ├── bun.lockb
 ├── custom.d.ts
@@ -330,7 +347,7 @@ gogo-scraper/
 └── README.md
 ```
 
-- **`routes/episodes.ts`**: Defines the route for fetching episode information.
+- **`routes/sources.ts`**: Defines the route for fetching episode sources.
 - **`routes/mappings.ts`**: Defines the route for fetching mappings information.
 - **`routes/info.ts`**: Defines the route for fetching anime information from AniList.
 - **`providers/gogoanime/`**: Contains modules related to fetching data from Gogoanime.

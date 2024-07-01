@@ -6,10 +6,8 @@ interface Cache<T> {
 
 const cacheMap = new Map<string, any>();
 
-const createCache = <T>(): Cache<T> => ({
+export const createCache = <T>(): Cache<T> => ({
     has: (key: string) => cacheMap.has(key),
     get: (key: string) => cacheMap.get(key),
     set: (key: string, value: T) => cacheMap.set(key, value)
 });
-
-export default createCache;

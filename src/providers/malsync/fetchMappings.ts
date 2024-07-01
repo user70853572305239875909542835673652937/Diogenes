@@ -1,5 +1,4 @@
-import { fetchData } from "../../services/fetchData";
-import { cache } from '../../utils/cacheSetup';
+import { cache, fetchData } from '../../index';
 
 
 interface SiteInfo {
@@ -30,7 +29,7 @@ interface MappingResponse {
     Sites: Sites;
 }
 
-const fetchMappings = async (id: string): Promise<MappingResponse | null> => {
+export const fetchMappings = async (id: string): Promise<MappingResponse | null> => {
     const cacheKey = `mappings-${id}`;
 
     if (cache.has(cacheKey)) {
@@ -51,5 +50,3 @@ const fetchMappings = async (id: string): Promise<MappingResponse | null> => {
         return null;
     }
 };
-
-export default fetchMappings;

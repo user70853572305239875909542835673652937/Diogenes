@@ -1,7 +1,7 @@
 import express from 'express';
 import infoRouter from './routes/info';
 import mappingsRouter from './routes/mappings';
-import episodesRouter from './routes/episodes';
+import sourcessRouter from './routes/sources';
 import os from 'os';
 import winston from 'winston';
 
@@ -24,7 +24,7 @@ const port = process.env.PORT || 8080;
 
 app.use('/info', infoRouter);
 app.use('/mappings', mappingsRouter);
-app.use('/episodes', episodesRouter);
+app.use('/sources', sourcessRouter);
 
 app.listen(port, () => {
     const localIP = '127.0.0.1';

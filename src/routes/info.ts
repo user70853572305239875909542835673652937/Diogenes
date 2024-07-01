@@ -1,5 +1,5 @@
 import express from 'express';
-import fetchInfo from '../providers/anilist/fetchInfo';
+import { fetchInfo } from '../index';
 
 const router = express.Router();
 

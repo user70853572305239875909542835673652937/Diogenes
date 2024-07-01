@@ -6,74 +6,93 @@ puppeteer.use(stealth());
 
 export interface FetchM3U8Result {
     m3u8: string | null;
-    downloadUrl: string | null;
 }
 
-const fetchM3U8 = async (iframeUrl: string): Promise<FetchM3U8Result> => {
+export const fetchM3U8 = async (iframeUrl: string): Promise<FetchM3U8Result> => {
     const browser = await puppeteer.launch({
         headless: true,
         executablePath: chrome,
         defaultViewport: null,
-        args: ['--autoplay-policy=no-user-gesture-required']
+        args: [
+            '--autoplay-policy=no-user-gesture-required',
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-extensions',
+            '--disable-background-networking',
+            '--disable-background-timer-throttling',
+            '--disable-backgrounding-occluded-windows',
+            '--disable-breakpad',
+            '--disable-component-extensions-with-background-pages',
+            '--disable-features=TranslateUI,BlinkGenPropertyTrees',
+            '--disable-ipc-flooding-protection',
+            '--disable-renderer-backgrounding',
+            '--enable-features=NetworkService,NetworkServiceInProcess',
+            '--hide-scrollbars',
+            '--mute-audio',
+            '--no-first-run',
+            '--no-pings',
+            '--disable-popup-blocking'
+        ]
     });
 
     const page = await browser.newPage();
+
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+        const resourceType = req.resourceType();
+        if (resourceType === 'image' || resourceType === 'stylesheet' || resourceType === 'font') {
+            req.abort();
+        } else {
+            req.continue();
+        }
+    });
+
     const client = await page.target().createCDPSession();
 
-    await client.send('Network.enable');
-    await client.send('Network.setRequestInterception', {
-        patterns: [{ urlPattern: '*' }]
-    });
+    try {
+        await client.send('Network.enable');
+        await client.send('Network.setRequestInterception', {
+            patterns: [{ urlPattern: '*' }]
+        });
 
-    let m3u8: string | null = null;
-    let downloadUrl: string | null = null;
-    let foundPrimaryM3U8 = false;
+        let m3u8: string | null = null;
+        let foundPrimaryM3U8 = false;
 
-    client.on('Network.requestIntercepted', async ({ interceptionId, request }: { interceptionId: string, request: any }) => {
-        if (foundPrimaryM3U8) {
-            await client.send('Network.continueInterceptedRequest', { interceptionId });
-            return;
-        }
-
-        if (request.url.includes('.m3u8') && !request.url.includes('ping.gif')) {
-            console.log(`M3U8 URL: ${request.url}`);
-            m3u8 = request.url;
-            if (m3u8) {
-                foundPrimaryM3U8 = true;
+        client.on('Network.requestIntercepted', async ({ interceptionId, request }: { interceptionId: string, request: any }) => {
+            if (foundPrimaryM3U8) {
+                await client.send('Network.continueInterceptedRequest', { interceptionId });
+                return;
             }
-        }
-        await client.send('Network.continueInterceptedRequest', { interceptionId });
-    });
 
-    await page.goto(iframeUrl, { waitUntil: 'networkidle2' });
+            if (request.url.includes('.m3u8') && !request.url.includes('ping.gif')) {
+                m3u8 = request.url;
+                if (m3u8) {
+                    foundPrimaryM3U8 = true;
+                }
+            }
+            await client.send('Network.continueInterceptedRequest', { interceptionId });
+        });
 
-    await page.evaluate(() => {
-        const playBtnXPath = "/html/body/div[1]/div/div[3]/div[2]/div[13]/div[1]/div/div/div[2]/div";
-        const playBtn = document.evaluate(playBtnXPath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        if (playBtn) {
-            (playBtn as HTMLElement).click();
-        }
-    });
+        await page.goto(iframeUrl, { waitUntil: 'networkidle2' });
 
-    await page.waitForFunction(() => {
-        const videoElement = document.querySelector('video');
-        return videoElement && !videoElement.paused;
-    });
+        await page.evaluate(() => {
+            const playBtn = document.querySelector('.jw-icon-display');
+            if (playBtn) {
+                (playBtn as HTMLElement).click();
+            }
+        });
 
-    await new Promise(resolve => setTimeout(resolve, 2000));
+        await page.waitForFunction(() => {
+            const videoElement = document.querySelector('video');
+            return videoElement && !videoElement.paused;
+        });
 
-    downloadUrl = await page.evaluate(() => {
-        const iframe = document.querySelector('iframe');
-        if (iframe) {
-            const embed = iframe.src;
-            const idMatch = embed.match(/id=([^&]+)/);
-            return idMatch ? `https://s3taku.com/download?id=${idMatch[1]}` : null;
-        }
-        return null;
-    });
-
-    await browser.close();
-    return { m3u8, downloadUrl };
+        return { m3u8 };
+    } catch (error) {
+        console.error('Error fetching M3U8:', error);
+        return { m3u8: null };
+    } finally {
+        await browser.close();
+    }
 };
-
-export default fetchM3U8;

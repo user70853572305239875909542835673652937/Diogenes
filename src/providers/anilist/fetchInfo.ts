@@ -1,8 +1,7 @@
 import axios from 'axios';
-import { cache } from '../../utils/cacheSetup';
-import { infoQuery } from './queries';
+import { cache, infoQuery } from '../../index';
 
-const fetchInfo = async (id: string) => {
+export const fetchInfo = async (id: string) => {
     const cacheKey = `anime-${id}`;
 
     if (cache.has(cacheKey)) {
@@ -38,5 +37,3 @@ const fetchInfo = async (id: string) => {
         return null;
     }
 };
-
-export default fetchInfo;

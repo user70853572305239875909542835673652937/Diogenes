@@ -1,5 +1,5 @@
 import express from 'express';
-import fetchMappings from '../providers/malsync/fetchMappings';
+import { fetchMappings } from '../providers/malsync/fetchMappings';
 
 const router = express.Router();
 

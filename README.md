@@ -1,4 +1,4 @@
-# ![jerry](https://cdn.discordapp.com/emojis/1253722954504863844.webp?size=28&quality=lossless) Gogo Scraper Dude
+# ![jerry](https://cdn.discordapp.com/emojis/1253722954504863844.webp?size=28&quality=lossless) Diogenes Scraper Dude
 
 <img src="https://i.pinimg.com/564x/32/8b/3c/328b3cc06b7863db5c790883e5df49fa.jpg" align="right" width="80" />
 
@@ -34,8 +34,8 @@
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/akionii/gogo-scraper.git
-   cd gogo-scraper
+   git clone https://github.com/akionii/Diogenes.git
+   cd Diogenes
    ```
 
 2. Install dependencies using Bun:
@@ -254,13 +254,6 @@ curl "http://localhost:8080/info?id=21"
       "thumbnail": "https://img1.ak.crunchyroll.com/i/spire4-tmb/d80b3fbce742e6deb4d2caf37d08ca6e1395451246_full.jpg"
     },
     ...
-  ],
-  "tags": [
-    {
-      "name": "Pirates",
-      "description": "Prominently features sea-faring adventurers branded as criminals by the law."
-    },
-    ...
   ]
 }
 ```
@@ -315,7 +308,7 @@ curl "http://localhost:8080/sources?id=one-piece&ep=1&provider=gogoanime"
 ## Project Structure
 
 ```plaintext
-gogo-scraper/
+Diogenes/
 │
 ├── src/
 │   ├── routes/

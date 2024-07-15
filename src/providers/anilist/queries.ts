@@ -60,10 +60,6 @@ export const infoQuery = `
                 id
                 site
             }
-            tags {
-                name
-                description
-            }
         }
     }
 `;

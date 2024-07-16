@@ -169,12 +169,13 @@ curl "http://localhost:8080/mappings?id=21"
 - **Endpoint:** `/info`
 - **Method:** `GET`
 - **Query Parameters:**
-  - `id` (string): The ID of the anime on AniList.
+  - `id` (string): The ID of the anime.
+    - `provider` (string): The provider's ID, e.g., 'anilist', 'gogoanime', '9anime', 'zoro'.
 
 #### Example Request
 
 ```bash
-curl "http://localhost:8080/info?id=21"
+curl "http://localhost:8080/info?id=21&provider=anilist"
 ```
 
 #### Example Response
@@ -265,7 +266,7 @@ curl "http://localhost:8080/info?id=21"
 - **Query Parameters:**
   - `id` (string): The ID of the anime.
   - `ep` (number): The episode number.
-  - `provider` (string): The provider name, e.g., 'gogoanime', '9anime', 'zoro'.
+  - `provider` (string): The provider's ID, e.g., 'gogoanime', '9anime', 'zoro'.
 
 #### Example Request
 
@@ -317,6 +318,7 @@ Diogenes/
 │   │   └── mappings.ts
 │   ├── providers/
 │   │   ├── gogoanime/
+│   │   │   ├── fetchInfo.ts
 │   │   │   ├── fetchM3U8.ts
 │   │   │   └── fetchSources.ts
 │   │   ├── anilist/
@@ -342,7 +344,7 @@ Diogenes/
 
 - **`routes/sources.ts`**: Defines the route for fetching episode sources.
 - **`routes/mappings.ts`**: Defines the route for fetching mappings information.
-- **`routes/info.ts`**: Defines the route for fetching anime information from AniList.
+- **`routes/info.ts`**: Defines the route for fetching anime information from AniList and Gogoanime.
 - **`providers/gogoanime/`**: Contains modules related to fetching data from Gogoanime.
 - **`providers/anilist/`**: Contains modules related to fetching data from AniList.
 - **`providers/malsync/`**: Contains modules related to fetching data from Malsync.

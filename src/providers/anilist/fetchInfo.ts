@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { cache, infoQuery } from '../../index';
 
-export const fetchInfo = async (id: string) => {
-    const cacheKey = `anime-${id}`;
+export const fetchInfoAnilist = async (id: string) => {
+    const cacheKey = `anilist:${id}`;
 
     if (cache.has(cacheKey)) {
         console.log(`Fetching anime info for id ${id} from cache`);

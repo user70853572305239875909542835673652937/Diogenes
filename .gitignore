@@ -137,7 +137,12 @@ dist
 # Finder (MacOS) folder config
 .DS_Store
 
+# npm lock
+package-lock.json
+
 # Bun files
 bun.lockb
 bunfig.toml
 
+# Censys Proxies
+proxies.json

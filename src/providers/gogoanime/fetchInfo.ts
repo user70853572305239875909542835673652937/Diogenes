@@ -1,5 +1,6 @@
 import axios from 'axios';
-import cheerio, { type CheerioAPI } from 'cheerio';
+import * as cheerio from 'cheerio';
+import { type CheerioAPI } from 'cheerio';
 import { cache } from '../../index';
 
 export const fetchInfoGogo = async (id: string) => {
@@ -22,10 +23,10 @@ export const fetchInfoGogo = async (id: string) => {
             image: $('div.anime_info_body_bg img').attr('src'),
             type: $('p.type:contains("Type:") a').text().trim(),
             description: $('div.description p').text().trim(),
-            genre: $('p.type:contains("Genre:") a').map((i, el) => $(el).text().trim()).get().join(', '),
+            genre: $('p.type:contains("Genre:") a').map((i: number, el: any) => $(el).text().trim()).get().join(', '),
             released: $('p.type:contains("Released:")').text().replace('Released: ', '').trim(),
             status: $('p.type:contains("Status:") a').text().trim(),
-            otherNames: $('p.type.other-name a').map((i, el) => $(el).text().trim()).get().join(', '),
+            otherNames: $('p.type.other-name a').map((i: number, el: any) => $(el).text().trim()).get().join(', '),
             episodes: getTotalEpisodes($),
         };
 

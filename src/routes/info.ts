@@ -2,8 +2,8 @@ import express from 'express';
 import { type Request, type Response } from 'express';
 import { fetchInfoAnilist } from '../providers/anilist/fetchInfo';
 import { fetchInfoGogo } from '../providers/gogoanime/fetchInfo';
-// import fetchInfo9anime from '../providers/9anime/fetchInfo';
-// import fetchInfoZoro from '../providers/zoro/fetchInfo';
+import { fetchInfoZoro } from '../providers/zoro/fetchInfo';
+import { fetchInfoAnimepahe } from '../providers/animepahe/fetchInfo';
 
 const router = express.Router();
 
@@ -13,7 +13,8 @@ const router = express.Router();
 const providers: { [key: string]: (id: string) => Promise<any> } = {
     anilist: fetchInfoAnilist,
     gogoanime: fetchInfoGogo,
-    // 'otherProvider': fetchInfoOtherProvider, // Add other providers here
+    zoro: fetchInfoZoro,
+    animepahe: fetchInfoAnimepahe, // Add AnimePahe to the providers mapping
 };
 
 /**
@@ -24,8 +25,8 @@ interface UsageResponse {
     error: string | null;
     status: number;
     format: {
-        id: { type: string, description: string };
-        provider: { type: string, description: string };
+        id: { type: string; description: string };
+        provider: { type: string; description: string };
     };
     example: { url: string };
 }
@@ -40,27 +41,35 @@ const generateResponse = (error: string | null = null, status: number = 200): Us
     error,
     status,
     format: {
-        id: { type: "string", description: "The ID of the anime. This is a unique identifier for the anime series." },
-        provider: { type: "string", description: "The provider name. Supported values include 'anilist', 'gogoanime'." }
+        id: {
+            type: "string",
+            description: "The ID of the anime. This is a unique identifier for the anime series.",
+        },
+        provider: {
+            type: "string",
+            description:
+                "The provider name. Supported values include 'anilist', 'gogoanime', 'zoro', 'animepahe'.",
+        },
     },
-    example: { url: "/?id=21&provider=anilist" }
+    example: { url: "/?id=5687&provider=animepahe" }, // Updated example URL to include AnimePahe
 });
 
 /**
  * @route GET /
  * @description Fetches information for a specified anime from a given provider.
  * @queryParam {string} id - The unique ID of the anime series.
- * @queryParam {string} provider - The name of the provider. Supported values: 'anilist', 'gogoanime'.
+ * @queryParam {string} provider - The name of the provider. Supported values: 'anilist', 'gogoanime', 'zoro', 'animepahe'.
  * @returns {Object} JSON response containing anime information or usage instructions.
  * 
  * @example
- * // Fetch info for 'one-piece' from 'anilist'
- * GET /?id=one-piece&provider=anilist
+ * // Fetch info for 'Nageki no Bourei wa Intai shitai' from 'animepahe'
+ * GET /?id=5687&provider=animepahe
  * 
  * @response {UsageResponse} 200 - Returns usage instructions if no parameters are provided.
  * @response {Object} 200 - Returns anime information if valid parameters are provided.
  * @response {UsageResponse} 400 - Returns error details and usage instructions if parameters are missing or invalid.
- * @response {string} 500 - Internal server error message if an error occurs while fetching data.
+ * @response {UsageResponse} 404 - Returns error details if the anime is not found.
+ * @response {UsageResponse} 500 - Internal server error message if an error occurs while fetching data.
  */
 router.get('/', async (req: Request, res: Response) => {
     const { id, provider } = req.query;

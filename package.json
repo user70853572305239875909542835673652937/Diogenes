@@ -12,26 +12,28 @@
     "@types/cheerio": "^0.22.35",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^4.17.21",
-    "@types/node": "^20.14.10",
+    "@types/node": "^20.16.11",
     "@types/prompt-sync": "^4.2.3",
     "@types/puppeteer": "^7.0.4",
     "eslint": "9.6.0",
-    "eslint-plugin-import": "^2.29.1",
-    "typescript": "^5.5.3"
+    "eslint-plugin-import": "^2.31.0",
+    "typescript": "^5.6.3"
   },
   "peerDependencies": {
     "typescript": "^5.5.2"
   },
   "dependencies": {
     "@types/axios": "^0.14.0",
-    "axios": "^1.7.2",
-    "cheerio": "^1.0.0-rc.12",
+    "axios": "^1.7.7",
+    "cheerio": "^1.0.0",
     "chrome-paths": "^1.0.1",
-    "express": "^4.19.2",
+    "express": "^4.21.1",
+    "fs": "^0.0.1-security",
+    "jsdom": "^16.7.0",
     "lint": "^0.8.19",
-    "puppeteer": "^22.13.0",
+    "puppeteer": "^22.15.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "winston": "^3.13.1"
+    "winston": "^3.15.0"
   }
 }

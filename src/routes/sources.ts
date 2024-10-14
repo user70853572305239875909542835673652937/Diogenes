@@ -1,7 +1,7 @@
 import express from 'express';
 import { type Request, type Response } from 'express';
 import { fetchSourcesGogo } from '../index';
-// import fetchSources9anime from '../providers/9anime/fetchSources';
+import { fetchSourcesPahe } from '../providers/animepahe/fetchSources';
 // import fetchSourcesZoro from '../providers/zoro/fetchSources';
 
 const router = express.Router();
@@ -9,23 +9,22 @@ const router = express.Router();
 /**
  * Providers mapping to their respective fetch source functions.
  */
-const providers: { [key: string]: (provider: string, id: string, ep: number) => Promise<any> } = {
+const providers: { [key: string]: (provider: string, id: string, ep: string | number) => Promise<any> } = {
     gogoanime: fetchSourcesGogo,
-    // '9anime': fetchSources9anime,
+    animepahe: fetchSourcesPahe, // Added AnimePahe provider
     // 'zoro': fetchSourcesZoro
 };
 
 /**
  * UsageResponse Interface
- * Defines the structure of the response for usage instructions.
  */
 interface UsageResponse {
     error: string | null;
     status: number;
     format: {
-        id: { type: string, description: string };
-        ep: { type: string, description: string };
-        provider: { type: string, description: string };
+        id: { type: string; description: string };
+        ep: { type: string; description: string };
+        provider: { type: string; description: string };
     };
     example: { url: string };
 }
@@ -41,8 +40,8 @@ const generateResponse = (error: string | null = null, status: number = 200): Us
     status,
     format: {
         id: { type: "string", description: "The ID of the anime. This is a unique identifier for the anime series." },
-        ep: { type: "number", description: "The episode number. This should be a valid episode number for the given anime ID." },
-        provider: { type: "string", description: "The provider name. Supported values include 'gogoanime'." }
+        ep: { type: "string", description: "The episode identifier. This can be a number or a string (e.g., 'S1E1', 'OVA')." },
+        provider: { type: "string", description: "The provider name. Supported values include 'gogoanime', 'animepahe'." }
     },
     example: { url: "/?id=one-piece&ep=1&provider=gogoanime" }
 });
@@ -51,8 +50,8 @@ const generateResponse = (error: string | null = null, status: number = 200): Us
  * @route GET /
  * @description Fetches streaming sources for a specified anime episode from a given provider.
  * @queryParam {string} id - The unique ID of the anime series.
- * @queryParam {number} ep - The episode number of the anime.
- * @queryParam {string} provider - The name of the provider. Supported values: 'gogoanime'.
+ * @queryParam {string|number} ep - The episode identifier, which can be a number or string.
+ * @queryParam {string} provider - The name of the provider. Supported values: 'gogoanime', 'animepahe'.
  * @returns {Object} JSON response containing streaming sources or usage information.
  * 
  * @example
@@ -62,7 +61,7 @@ const generateResponse = (error: string | null = null, status: number = 200): Us
  * @response {UsageResponse} 200 - Returns usage instructions if no parameters are provided.
  * @response {Object} 200 - Returns streaming sources if valid parameters are provided.
  * @response {UsageResponse} 400 - Returns error details and usage instructions if parameters are missing or invalid.
- * @response {string} 500 - Internal server error message if an error occurs while fetching data.
+ * @response {UsageResponse} 500 - Internal server error message if an error occurs while fetching data.
  */
 router.get('/', async (req: Request, res: Response) => {
     const { id, ep, provider } = req.query;
@@ -74,7 +73,7 @@ router.get('/', async (req: Request, res: Response) => {
 
     // Validate presence of required query parameters
     if (!id || !ep || !provider) {
-        return res.status(400).json(generateResponse("Missing id, episode number, or provider", 400));
+        return res.status(400).json(generateResponse("Missing id, episode identifier, or provider", 400));
     }
 
     const providerKey = provider as string;
@@ -85,8 +84,21 @@ router.get('/', async (req: Request, res: Response) => {
     }
 
     try {
+        const animeId = id as string;
+        const episodeIdentifier = ep as string;
+
+        // Add additional validation if necessary for specific episode formats
+        if (!episodeIdentifier) {
+            return res.status(400).json(generateResponse("Invalid episode identifier", 400));
+        }
+
         // Fetch sources from the specified provider
-        const sourcesResponse = await providers[providerKey](provider as string, id as string, parseInt(ep as string));
+        const sourcesResponse = await providers[providerKey](providerKey, animeId, episodeIdentifier);
+
+        if (!sourcesResponse) {
+            return res.status(404).json(generateResponse("No sources found", 404));
+        }
+
         res.json(sourcesResponse);
     } catch (error) {
         console.error(error);

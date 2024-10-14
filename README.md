@@ -81,18 +81,6 @@ curl "http://localhost:8080/mappings?id=21"
   "image": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/medium/bx21-YCDoj1EkAxFn.jpg",
   "malId": 21,
   "Sites": {
-    "9anime": {
-      "ov8": {
-        "identifier": "ov8",
-        "image": "https://static.aniwave.to/i/1/1b/1bb2150e9529b52995336d38e74e94b6.jpg",
-        "malId": 21,
-        "aniId": 21,
-        "page": "9anime",
-        "title": "ONE PIECE",
-        "type": "anime",
-        "url": "https://aniwave.to/watch/one-piece.ov8"
-      }
-    },
     "Gogoanime": {
       "one-piece": {
         "identifier": "one-piece",
@@ -170,7 +158,7 @@ curl "http://localhost:8080/mappings?id=21"
 - **Method:** `GET`
 - **Query Parameters:**
   - `id` (string): The ID of the anime.
-    - `provider` (string): The provider's ID, e.g., 'anilist', 'gogoanime', '9anime', 'zoro'.
+    - `provider` (string): The provider's ID, e.g., 'anilist', 'gogoanime', 'zoro', 'animepahe'.
 
 #### Example Request
 
@@ -266,7 +254,7 @@ curl "http://localhost:8080/info?id=21&provider=anilist"
 - **Query Parameters:**
   - `id` (string): The ID of the anime.
   - `ep` (number): The episode number.
-  - `provider` (string): The provider's ID, e.g., 'gogoanime', '9anime', 'zoro'.
+  - `provider` (string): The provider's ID, e.g., 'gogoanime', 'zoro', 'animepahe'.
 
 #### Example Request
 

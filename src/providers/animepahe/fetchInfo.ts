@@ -31,6 +31,7 @@ interface PaheInfo {
   studio: string;
   externalLinks: string[];
   episodes: number;
+  episode: number;
   episodeList: Episode[];
 }
 
@@ -142,11 +143,11 @@ export const fetchInfoAnimepahe = async (
         .map((i: number, el: any) => $(el).attr("href"))
         .get()
         .map((link) => `https:${link}`),
-      episodes:
-        parseInt(
-          $('p:contains("Episodes:")').text().replace("Episodes:", "").trim(),
-          10,
-        ) || 0,
+      episodes: parseInt(
+        $('p:contains("Episodes:")').text().replace("Episodes:", "").trim(),
+        10,
+      ),
+      episode: 0,
       episodeList: [], // Will be populated below
     };
 
@@ -307,12 +308,23 @@ export const fetchInfoAnimepahe = async (
 
       // Optional: Sort the episodeList by episode number ascending
       animeInfo.episodeList.sort((a, b) => a.number - b.number);
+
+      // Determine the latest episode number
+      if (animeInfo.episodeList.length > 0) {
+        animeInfo.episode = Math.max(
+          ...animeInfo.episodeList.map((ep) => ep.number),
+        );
+      } else {
+        animeInfo.episode = 0; // Default to 0 if no episodes are found
+      }
+
+      // Debug: Log the complete episode list and the latest episode number
+      console.log("Complete Episode List:", animeInfo.episodeList);
+      console.log(`Latest Episode Number: ${animeInfo.episode}`);
     } else {
       console.warn("No episode data found in API response.");
+      animeInfo.episode = 0;
     }
-
-    // Debug: Log the complete episode list
-    console.log("Complete Episode List:", animeInfo.episodeList);
 
     // Cache the Result
     cache.set(cacheKey, animeInfo);

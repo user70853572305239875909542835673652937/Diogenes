@@ -2,14 +2,15 @@
 
 <img src="https://i.pinimg.com/564x/32/8b/3c/328b3cc06b7863db5c790883e5df49fa.jpg" align="right" width="80" />
 
-**Simple Express.js API** designed to fetch anime episode information from Gogoanime, including **embeds**, **m3u8 links** (_360p, 480p, 720p & 1080p_), and **direct mp4 download URLs**. It leverages **Puppeteer** for web scraping and **Axios** for HTTP requests.
+**Diogenes Scraper Dude** is your go-to, overachieving **Express.js API** for scraping stuff from Gogoanime, AniList, Zoro, and AnimePahe. It hands over **embeds**, **m3u8 links**, and **direct mp4 download URLs**. With **Cheerio**, **JSDOM**, and the ever-reliable **Axios**.
 
 ## Features
 
-- Retrieves episode details such as **embeds**, **m3u8 links**, and **mp4 download URLs**.
-- Supports **dubbed episodes**.
-- Implements **caching** to enhance performance.
-- **Modularized codebase** for easy maintenance.
+- **Gets all the data**: Embeds, m3u8, mp4... n stuff.
+- **Dubbed episodes too**: why not?
+- **Caching**: Saves time.
+- **Modular and neat**: So you don’t lose your mind.
+- **Logging**: just logs.
 
 ## Table of Contents
 
@@ -18,7 +19,7 @@
 - [Usage](#usage)
 - [API Endpoints](#api-endpoints)
   - [Fetch Mappings](#fetch-mappings)
-  - [Fetch Info](#fetch-anime-info)
+  - [Fetch Info](#fetch-info)
   - [Fetch Episode Sources](#fetch-episode-sources)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
@@ -27,18 +28,17 @@
 
 - **Node.js** (_v12.x or later_)
 - **Bun** (_dependency management tool_)
-- **Google Chrome or Chromium browser**
 
 ## Installation
 
-1. Clone the repository:
+1. **Clone the repository:**
 
    ```bash
    git clone https://github.com/akionii/Diogenes.git
    cd Diogenes
    ```
 
-2. Install dependencies using Bun:
+2. **Install dependencies using Bun:**
 
    ```bash
    bun install
@@ -46,13 +46,15 @@
 
 ## Usage
 
-1. Start the server:
+1. **Start the server:**
 
    ```bash
    bun start
    ```
 
-2. The server will run on port `8080` by default. You can access the API at `http://localhost:8080/`.
+2. **Access the API:**
+
+   The server will run on port `8080` by default. You can interact with the API at `http://localhost:8080/`.
 
 ## API Endpoints
 
@@ -60,8 +62,10 @@
 
 - **Endpoint:** `/mappings`
 - **Method:** `GET`
+- **Description:** Retrieves mapping information for a specific anime based on its AniList ID.
+
 - **Query Parameters:**
-  - `id` (number): The ID of the anime on AniList.
+  - `id` (number, required): The ID of the anime on AniList.
 
 #### Example Request
 
@@ -152,13 +156,15 @@ curl "http://localhost:8080/mappings?id=21"
 }
 ```
 
-### Fetch Anime Info
+### Fetch Info
 
 - **Endpoint:** `/info`
 - **Method:** `GET`
+- **Description:** Retrieves detailed information about a specific anime from AniList or other providers.
+
 - **Query Parameters:**
-  - `id` (string): The ID of the anime.
-    - `provider` (string): The provider's ID, e.g., 'anilist', 'gogoanime', 'zoro', 'animepahe'.
+  - `id` (string, required): The ID of the anime.
+  - `provider` (string, required): The provider's ID (e.g., `anilist`, `gogoanime`, `zoro`, `animepahe`).
 
 #### Example Request
 
@@ -204,13 +210,7 @@ curl "http://localhost:8080/info?id=21&provider=anilist"
   "duration": 24,
   "chapters": null,
   "volumes": null,
-  "genres": [
-    "Action",
-    "Adventure",
-    "Comedy",
-    "Drama",
-    "Fantasy"
-  ],
+  "genres": ["Action", "Adventure", "Comedy", "Drama", "Fantasy"],
   "synonyms": [
     "ワンピース",
     "海贼王",
@@ -241,8 +241,8 @@ curl "http://localhost:8080/info?id=21&provider=anilist"
     {
       "title": "Episode 130 - Scent of Danger! the Seventh Member Is Nico Robin!",
       "thumbnail": "https://img1.ak.crunchyroll.com/i/spire4-tmb/d80b3fbce742e6deb4d2caf37d08ca6e1395451246_full.jpg"
-    },
-    ...
+    }
+    // ...
   ]
 }
 ```
@@ -251,10 +251,12 @@ curl "http://localhost:8080/info?id=21&provider=anilist"
 
 - **Endpoint:** `/sources`
 - **Method:** `GET`
+- **Description:** Retrieves streaming sources and download URLs for a specific episode from a chosen provider.
+
 - **Query Parameters:**
-  - `id` (string): The ID of the anime.
-  - `ep` (number): The episode number.
-  - `provider` (string): The provider's ID, e.g., 'gogoanime', 'zoro', 'animepahe'.
+  - `id` (string, required): The ID of the anime.
+  - `ep` (number, required): The episode number.
+  - `provider` (string, required): The provider's ID (e.g., `gogoanime`, `zoro`, `animepahe`).
 
 #### Example Request
 
@@ -299,46 +301,105 @@ curl "http://localhost:8080/sources?id=one-piece&ep=1&provider=gogoanime"
 ```plaintext
 Diogenes/
 │
-├── src/
-│   ├── routes/
-│   │   ├── sources.ts
-│   │   ├── info.ts
-│   │   └── mappings.ts
-│   ├── providers/
-│   │   ├── gogoanime/
-│   │   │   ├── fetchInfo.ts
-│   │   │   ├── fetchM3U8.ts
-│   │   │   └── fetchSources.ts
-│   │   ├── anilist/
-│   │   │   ├── fetchInfo.ts
-│   │   │   └── queries.ts
-│   │   ├── malsync/
-│   │       └── fetchMappings.ts
-│   ├── services/
-│   │   └── fetchData.ts
-│   ├── utils/
-│   │   ├── cacheSetup.ts
-│   │   └── cache.ts
-│   ├── app.ts
-│   └── index.ts
-│
 ├── bun.lockb
-├── custom.d.ts
+├── logs/
+│   ├── combined.log
+│   ├── error.log
+│   └── exceptions.log
 ├── package.json
 ├── package-lock.json
 ├── tsconfig.json
-└── README.md
+├── README.md
+│
+├── src/
+│   ├── app.ts
+│   ├── index.ts
+│   │
+│   ├── providers/
+│   │   ├── anilist/
+│   │   │   ├── fetchInfo.ts
+│   │   │   └── queries.ts
+│   │   ├── animepahe/
+│   │   │   ├── fetchInfo.ts
+│   │   │   └── fetchSources.ts
+│   │   ├── gogoanime/
+│   │   │   ├── fetchInfo.ts
+│   │   │   ├── fetchSources.ts
+│   │   │   ├── gogocdn.ts
+│   │   │   └── streamwish.ts
+│   │   ├── malsync/
+│   │   │   └── fetchMappings.ts
+│   │   └── zoro/
+│   │       ├── fetchEpisodes.ts
+│   │       ├── fetchInfo.ts
+│   │       ├── fetchServers.ts
+│   │       └── fetchSources.ts
+│   │
+│   ├── routes/
+│   │   ├── episodes.ts
+│   │   ├── info.ts
+│   │   ├── mappings.ts
+│   │   ├── servers.ts
+│   │   └── sources.ts
+│   │
+│   ├── services/
+│   │   ├── fetchProxy.ts
+│   │   ├── proxies.json
+│   │   └── verifyProxy.ts
+│   │
+│   └── utils/
+│       ├── cacheSetup.ts
+│       ├── cache.ts
+│       └── logger.ts
 ```
 
-- **`routes/sources.ts`**: Defines the route for fetching episode sources.
-- **`routes/mappings.ts`**: Defines the route for fetching mappings information.
-- **`routes/info.ts`**: Defines the route for fetching anime information from AniList and Gogoanime.
-- **`providers/gogoanime/`**: Contains modules related to fetching data from Gogoanime.
-- **`providers/anilist/`**: Contains modules related to fetching data from AniList.
-- **`providers/malsync/`**: Contains modules related to fetching data from Malsync.
-- **`services/fetchData.ts`**: Implements common data fetching logic.
-- **`utils/cache.ts`**: Provides caching mechanism for storing data.
-- **`app.ts`**: Initializes the Express.js server and includes route handlers.
+### Directory Overview
+
+- **`logs/`**: Stores log files for combined logs, error logs, and exception logs.
+- **`src/`**: Contains all source code.
+
+  - **`app.ts`**: Initializes the Express.js server and integrates middleware.
+  - **`index.ts`**: Entry point of the application.
+  - **`providers/`**: Houses modules for interacting with different anime data providers.
+
+    - **`anilist/`**
+      - `fetchInfo.ts`: Fetches anime information from AniList.
+      - `queries.ts`: Contains GraphQL queries for AniList API.
+    - **`animepahe/`**
+      - `fetchInfo.ts`: Fetches anime information from AnimePahe.
+      - `fetchSources.ts`: Retrieves episode sources from AnimePahe.
+    - **`gogoanime/`**
+      - `fetchInfo.ts`: Fetches anime information from Gogoanime.
+      - `fetchSources.ts`: Retrieves episode sources from Gogoanime.
+      - `gogocdn.ts`: Handles CDN-related functionalities for Gogoanime.
+      - `streamwish.ts`: Integrates with Streamwish for streaming sources.
+    - **`malsync/`**
+      - `fetchMappings.ts`: Fetches and synchronizes mappings from Malsync.
+    - **`zoro/`**
+      - `fetchEpisodes.ts`: Retrieves episode details from Zoro.
+      - `fetchInfo.ts`: Fetches anime information from Zoro.
+      - `fetchServers.ts`: Retrieves server information from Zoro.
+      - `fetchSources.ts`: Retrieves episode sources from Zoro.
+
+  - **`routes/`**: Defines API endpoints.
+
+    - `episodes.ts`: Route for fetching episodes.
+    - `info.ts`: Route for fetching anime information.
+    - `mappings.ts`: Route for fetching mappings.
+    - `servers.ts`: Route for fetching server information.
+    - `sources.ts`: Route for fetching episode sources.
+
+  - **`services/`**: Contains service modules for various functionalities.
+
+    - `fetchProxy.ts`: Manages proxy fetching for requests.
+    - `proxies.json`: Stores proxy configurations.
+    - `verifyProxy.ts`: Verifies the reliability of proxies.
+
+  - **`utils/`**: Utility modules for supporting functionalities.
+
+    - `cacheSetup.ts`: Configures caching mechanisms.
+    - `cache.ts`: Provides caching utilities for storing and retrieving data.
+    - `logger.ts`: Implements logging functionalities.
 
 ## Contributing
 

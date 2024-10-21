@@ -1,184 +1,167 @@
-import axios from 'axios';
-import * as cheerio from 'cheerio';
-import puppeteer from 'puppeteer-extra';
-import stealth from 'puppeteer-extra-plugin-stealth';
-import { cache } from '../../utils/cacheSetup';
+import axios from "axios";
+import * as cheerio from "cheerio";
+import { cache } from "../../utils/cacheSetup";
+import { gogoCDN } from "./gogocdn";
+import { streamwish } from "./streamwish";
 
-puppeteer.use(stealth());
-
-interface Source {
-    embed: string;
-    m3u8: string | null;
+interface Src {
+  embed: string;
+  m3u8?: string;
+  m3u8_bk?: string;
+  slides?: string;
 }
 
-interface SourcesResponse {
-    provider: string;
-    episodeId: string;
-    downloadUrl: string | null;
-    sources: { [key: string]: Source };
+interface SrcResponse {
+  provider: string;
+  epId: string;
+  srcList: { [key: string]: Src };
 }
 
-const fetchDownloadUrl = async (embedUrl: string): Promise<string | null> => {
-    const browser = await puppeteer.launch({ headless: true });
-    const page = await browser.newPage();
+interface CachedSrc {
+  srcList: { [key: string]: Src };
+}
 
-    await page.goto(embedUrl, { waitUntil: 'networkidle2' });
+interface DecData {
+  m3u8?: string;
+  m3u8_bk?: string;
+  slides?: string;
+}
 
-    const downloadUrl = await page.evaluate(() => {
-        const iframe = document.querySelector('iframe');
-        if (iframe) {
-            const embed = iframe.src;
-            const idMatch = embed.match(/id=([^&]+)/);
-            return idMatch ? `https://s3taku.com/download?id=${idMatch[1]}` : null;
-        }
-        return null;
-    });
+/**
+ * Retrieves sources for a specific anime episode from various servers.
+ * @param provider - Name of the provider.
+ * @param id - Identifier for the anime.
+ * @param ep - Episode number.
+ * @returns An object containing the sources and related details.
+ */
+export const fetchSourcesGogo = async (
+  provider: string,
+  id: string,
+  ep: string,
+): Promise<SrcResponse> => {
+  const srcs: { [key: string]: Src } = {};
+  const epId = `${id}-episode-${ep}`;
+  const cacheKey = epId;
 
-    await browser.close();
-    return downloadUrl;
-};
-
-const fetchM3U8Directly = async (embedUrl: string): Promise<string | null> => {
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-extensions',
-            '--disable-background-networking',
-            '--disable-background-timer-throttling',
-            '--disable-backgrounding-occluded-windows',
-            '--disable-breakpad',
-            '--disable-component-extensions-with-background-pages',
-            '--disable-features=TranslateUI,BlinkGenPropertyTrees',
-            '--disable-ipc-flooding-protection',
-            '--disable-renderer-backgrounding',
-            '--enable-features=NetworkService,NetworkServiceInProcess',
-            '--hide-scrollbars',
-            '--mute-audio',
-            '--no-first-run',
-            '--no-pings',
-            '--disable-popup-blocking'
-        ]
-    });
-
-    const page = await browser.newPage();
-
-    await page.setRequestInterception(true);
-    page.on('request', (req) => {
-        const resourceType = req.resourceType();
-        if (['image', 'stylesheet', 'font'].includes(resourceType)) {
-            req.abort();
-        } else {
-            req.continue();
-        }
-    });
-
-    const client = await page.target().createCDPSession();
-
-    let m3u8: string | null = null;
-    let foundPrimaryM3U8 = false;
-
-    try {
-        await client.send('Network.enable');
-        await client.send('Network.setRequestInterception', {
-            patterns: [{ urlPattern: '*' }]
-        });
-
-        client.on('Network.requestIntercepted', async ({ interceptionId, request }) => {
-            if (foundPrimaryM3U8) {
-                await client.send('Network.continueInterceptedRequest', { interceptionId });
-                return;
-            }
-
-            if (request.url.includes('.m3u8') && !request.url.includes('ping.gif')) {
-                m3u8 = request.url;
-                foundPrimaryM3U8 = true;
-            }
-            await client.send('Network.continueInterceptedRequest', { interceptionId });
-        });
-
-        await page.goto(embedUrl, { waitUntil: 'networkidle2' });
-
-        // If the video has a play button, click it to start playback and trigger m3u8 requests
-        await page.evaluate(() => {
-            const playBtn = document.querySelector('.jw-icon-display');
-            if (playBtn) {
-                (playBtn as HTMLElement).click();
-            }
-        });
-
-        await page.waitForFunction(() => {
-            const videoElement = document.querySelector('video');
-            return videoElement && !videoElement.paused;
-        });
-
-    } catch (error) {
-        console.error('Error fetching M3U8:', error);
-    } finally {
-        await browser.close();
+  try {
+    // Retrieve cached data if available
+    const cached: CachedSrc | null = await cache.get(cacheKey);
+    if (cached) {
+      console.log(`Fetching episode ${ep} from cache`);
+      if (cached.srcList && Object.keys(cached.srcList).length > 0) {
+        Object.assign(srcs, cached.srcList);
+        return { provider, epId: epId, srcList: srcs };
+      } else {
+        console.warn("Cached data is invalid or empty, fetching anew...");
+      }
     }
 
-    return m3u8;
-};
+    // Construct episode URL
+    const epUrl = `https://anitaku.pe/${id}-episode-${ep}`;
 
-export const fetchSourcesGogo = async (provider: string, animeId: string, episodeNumber: string | number): Promise<SourcesResponse> => {
-    const sources: { [key: string]: Source } = {};
-    let downloadUrl: string | null = null;
-    const episodeId = `${animeId}-episode-${episodeNumber}`;
+    const { data } = await axios.get(epUrl);
+    const $ = cheerio.load(data);
+    const serverAnchors = $(".anime_muti_link ul li a");
 
-    const retrieveSource = async (episodeNumber: string | number) => {
-        const cacheKey = episodeId;
-        if (cache.has(cacheKey)) {
-            console.log(`Fetching episode ${episodeNumber} from cache`);
-            const cachedData = cache.get(cacheKey)!;
-            Object.assign(sources, cachedData.sources);
-            downloadUrl = cachedData.downloadUrl;
-            return;
-        }
+    if (serverAnchors.length === 0) {
+      console.error(`No server links found for episode ${ep}`);
+      return { provider, epId: epId, srcList: srcs };
+    }
 
-        const episodeUrl = `https://s3taku.com/videos/${animeId}-episode-${episodeNumber}`;
-        try {
-            const response = await axios.get(episodeUrl);
-            const $ = cheerio.load(response.data);
-            const serverLinks = $('.anime_muti_link ul li a');
-
-            if (serverLinks.length === 0) {
-                console.error(`No server links found for episode ${episodeNumber}`);
-                return;
-            }
-
-            for (let i = 0; i < serverLinks.length; i++) {
-                const link = $(serverLinks[i]);
-                const embed = link.attr('data-video');
-                const serverName = link.contents().not(link.find('span')).text().trim();
-
-                if (embed) {
-                    // Directly use the logic from fetchM3U8 to get the m3u8 link
-                    const m3u8 = await fetchM3U8Directly(embed);
-
-                    // If we successfully get an m3u8, store the source and stop the loop
-                    if (m3u8) {
-                        sources[serverName] = { embed, m3u8 };
-
-                        if (serverName === 'Vidstreaming') {
-                            downloadUrl = await fetchDownloadUrl(embed);
-                        }
-                        break; // Stop after the first successful m3u8
-                    }
-                }
-            }
-
-            if (Object.keys(sources).length > 0) {
-                cache.set(cacheKey, { sources, downloadUrl });
-            }
-        } catch (error) {
-            console.error(`Error fetching episode ${episodeNumber}:`, error);
-        }
+    // Define extractors for different servers
+    const extractors: {
+      [key: string]: (embedUrl: string) => Promise<DecData | null>;
+    } = {
+      Vidstreaming: gogoCDN,
+      Streamwish: streamwish,
+      // Add other server extractors here, e.g., Mp4Upload, Doodstream, Vidhide
     };
 
-    await retrieveSource(episodeNumber);
+    // Collect supported server extractors
+    const supportedServers: Array<{
+      server: string;
+      embedUrl: string;
+      extractor: (embedUrl: string) => Promise<DecData | null>;
+    }> = [];
 
-    return { provider: provider, episodeId: episodeId, downloadUrl, sources };
+    serverAnchors.each((_, element) => {
+      const anchor = $(element);
+      const embedUrl = anchor.attr("data-video");
+      const server = anchor.contents().not(anchor.find("span")).text().trim();
+
+      if (!embedUrl || !server) {
+        console.warn(
+          "Skipping a server due to missing embed URL or server name.",
+        );
+        return;
+      }
+
+      if (extractors[server]) {
+        supportedServers.push({
+          server,
+          embedUrl,
+          extractor: extractors[server],
+        });
+      } else {
+        // **New Logic:** For unsupported servers, add the embed URL directly
+        console.warn(
+          `Unsupported server: ${server}, adding embed URL without extractor.`,
+        );
+        srcs[server] = {
+          embed: embedUrl,
+        };
+      }
+    });
+
+    if (supportedServers.length === 0 && Object.keys(srcs).length === 0) {
+      console.warn("No supported servers found for this episode.");
+      return { provider, epId: epId, srcList: srcs };
+    }
+
+    if (supportedServers.length > 0) {
+      console.log(
+        `Processing ${supportedServers.length} supported servers concurrently.`,
+      );
+
+      // Process all supported servers concurrently
+      const extractorPromises = supportedServers.map(
+        async ({ server, embedUrl, extractor }) => {
+          console.log(`Processing server: ${server}`);
+          try {
+            const decData = await extractor(embedUrl);
+            if (decData) {
+              srcs[server] = {
+                embed: embedUrl,
+                m3u8: decData.m3u8,
+                m3u8_bk: decData.m3u8_bk,
+                slides: decData.slides,
+              };
+              console.log(`Successfully extracted sources from ${server}`);
+            } else {
+              console.warn(
+                `Failed to extract decrypted data for server: ${server}`,
+              );
+            }
+          } catch (srvErr) {
+            console.error(`Error extracting data from ${server}:`, srvErr);
+          }
+        },
+      );
+
+      // Await all extractor promises
+      await Promise.all(extractorPromises);
+    }
+
+    // Cache the results if valid sources are found
+    if (Object.keys(srcs).length > 0) {
+      await cache.set(cacheKey, { srcList: srcs });
+      console.log(`Cached sources for episode ${epId}`);
+    } else {
+      console.warn("No valid sources found, not caching the result");
+    }
+  } catch (err) {
+    console.error(`Error fetching episode ${ep}:`, err);
+  }
+
+  return { provider, epId: epId, srcList: srcs };
 };

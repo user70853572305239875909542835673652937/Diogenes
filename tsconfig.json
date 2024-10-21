@@ -1,13 +1,6 @@
 {
   "compilerOptions": {
-    "types": [
-      "puppeteer",
-      "puppeteer-extra-plugin-stealth"
-    ],
-    "lib": [
-      "ESNext",
-      "DOM"
-    ],
+    "lib": ["ESNext", "DOM"],
     "target": "ESNext",
     "module": "ESNext",
     "moduleDetection": "force",

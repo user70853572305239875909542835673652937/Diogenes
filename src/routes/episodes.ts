@@ -1,20 +1,15 @@
 import express from "express";
 import { type Request, type Response } from "express";
-import { fetchInfoAnilist } from "../providers/anilist/fetchInfo";
-import { fetchInfoGogo } from "../providers/gogoanime/fetchInfo";
-import { fetchInfoZoro } from "../providers/zoro/fetchInfo";
-import { fetchInfoAnimepahe } from "../providers/animepahe/fetchInfo";
+import { fetchEpisodesZoro } from "../providers/zoro/fetchEpisodes";
 
 const router = express.Router();
 
 /**
- * Providers mapping to their respective fetchInfo functions.
+ * Providers mapping to their respective fetchEpisodes functions.
  */
-const providers: { [key: string]: (id: string) => Promise<any> } = {
-  anilist: fetchInfoAnilist,
-  gogoanime: fetchInfoGogo,
-  zoro: fetchInfoZoro,
-  animepahe: fetchInfoAnimepahe,
+const episodeProviders: { [key: string]: (id: string) => Promise<any> } = {
+  zoro: fetchEpisodesZoro,
+  // Add other providers here when their fetchEpisodes functions are available
 };
 
 /**
@@ -51,28 +46,27 @@ const generateResponse = (
     },
     provider: {
       type: "string",
-      description:
-        "The provider name. Supported values include 'anilist', 'gogoanime', 'zoro', 'animepahe'.",
+      description: "The provider name. Supported values include 'zoro'.",
     },
   },
-  example: { url: "/?id=5687&provider=animepahe" }, // Updated example URL to include AnimePahe
+  example: { url: "/episodes?id=19319&provider=zoro" },
 });
 
 /**
  * @route GET /
- * @description Fetches information for a specified anime from a given provider.
+ * @description Fetches episodes for a specified anime from a given provider.
  * @queryParam {string} id - The unique ID of the anime series.
- * @queryParam {string} provider - The name of the provider. Supported values: 'anilist', 'gogoanime', 'zoro', 'animepahe'.
- * @returns {Object} JSON response containing anime information or usage instructions.
+ * @queryParam {string} provider - The name of the provider. Supported values: 'zoro'.
+ * @returns {Object} JSON response containing episodes information or usage instructions.
  *
  * @example
- * // Fetch info for 'Nageki no Bourei wa Intai shitai' from 'animepahe'
- * GET /?id=5687&provider=animepahe
+ * // Fetch episodes for 'Dandadan' from 'zoro'
+ * GET /episodes?id=19319&provider=zoro
  *
  * @response {UsageResponse} 200 - Returns usage instructions if no parameters are provided.
- * @response {Object} 200 - Returns anime information if valid parameters are provided.
+ * @response {Object} 200 - Returns episodes information if valid parameters are provided.
  * @response {UsageResponse} 400 - Returns error details and usage instructions if parameters are missing or invalid.
- * @response {UsageResponse} 404 - Returns error details if the anime is not found.
+ * @response {UsageResponse} 404 - Returns error details if the episodes are not found.
  * @response {UsageResponse} 500 - Internal server error message if an error occurs while fetching data.
  */
 router.get("/", async (req: Request, res: Response) => {
@@ -93,24 +87,24 @@ router.get("/", async (req: Request, res: Response) => {
   const providerKey = provider as string;
 
   // Validate provider
-  if (!providers[providerKey]) {
+  if (!episodeProviders[providerKey]) {
     return res.status(400).json(generateResponse("Invalid provider", 400));
   }
 
   try {
-    // Fetch information from the specified provider
-    const infoResponse = await providers[providerKey](id as string);
-    if (!infoResponse) {
-      return res.status(404).json(generateResponse("Anime not found", 404));
+    // Fetch episodes from the specified provider
+    const episodesResponse = await episodeProviders[providerKey](id as string);
+    if (!episodesResponse) {
+      return res.status(404).json(generateResponse("Episodes not found", 404));
     }
-    res.json(infoResponse);
+    res.json(episodesResponse);
   } catch (error) {
     console.error(error);
     res
       .status(500)
       .json(
         generateResponse(
-          "An error occurred while fetching the anime information",
+          "An error occurred while fetching the episodes information",
           500,
         ),
       );

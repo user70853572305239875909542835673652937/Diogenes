@@ -1,4 +1,4 @@
-# ![jerry](https://cdn.discordapp.com/emojis/1253722954504863844.webp?size=28&quality=lossless) Diogenes Scraper Dude
+# ![jerry](https://cdn.discordapp.com/emojis/1253722954504863844.webp?size=28&quality=lossless) Diogenes Scraper Bru
 
 <img src="https://i.pinimg.com/564x/32/8b/3c/328b3cc06b7863db5c790883e5df49fa.jpg" align="right" width="80" />
 
@@ -20,6 +20,9 @@
 - [API Endpoints](#api-endpoints)
   - [Fetch Mappings](#fetch-mappings)
   - [Fetch Info](#fetch-info)
+  - [Fetch Episodes](#fetch-episodes)
+  - [Fetch Episode Servers](#fetch-episode-servers)
+  - [Fetch Info](#fetch-info)
   - [Fetch Episode Sources](#fetch-episode-sources)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
@@ -28,6 +31,8 @@
 
 - **Node.js** (_v12.x or later_)
 - **Bun** (_dependency management tool_)
+- **Redis** (_for caching mechanism_)
+- **Google Chrome or Chromium browser** (_if using Puppeteer_)
 
 ## Installation
 
@@ -42,6 +47,12 @@
 
    ```bash
    bun install
+   ```
+
+3. Start Redis server (if not already running):
+
+   ```bash
+   redis-server
    ```
 
 ## Usage
@@ -157,6 +168,7 @@ curl "http://localhost:8080/mappings?id=21"
 ```
 
 ### Fetch Info
+### Fetch Info
 
 - **Endpoint:** `/info`
 - **Method:** `GET`
@@ -241,9 +253,252 @@ curl "http://localhost:8080/info?id=21&provider=anilist"
     {
       "title": "Episode 130 - Scent of Danger! the Seventh Member Is Nico Robin!",
       "thumbnail": "https://img1.ak.crunchyroll.com/i/spire4-tmb/d80b3fbce742e6deb4d2caf37d08ca6e1395451246_full.jpg"
-    }
-    // ...
+    },
+    ...
   ]
+}
+```
+
+### Fetch Episodes
+
+- **Endpoint:** `/episodes`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `id` (string): The anime identifier.
+  - `provider` (string): The provider's ID (e.g., 'gogoanime', 'zoro', 'animepahe').
+
+#### Example Request
+
+```bash
+curl "http://localhost:8080/episodes?id=one-piece&provider=gogoanime"
+```
+
+#### Example Response
+
+```json
+{
+  "episodes": [
+    {
+      "episodeId": "one-piece-episode-1",
+      "episodeNumber": 1,
+      "title": "I'm Luffy! The Man Who's Gonna Be King of the Pirates!",
+      "url": "https://gogoanime.com/one-piece-episode-1"
+    }
+    // Additional episodes...
+  ]
+}
+```
+
+### Fetch Episode Servers
+
+- **Endpoint:** `/servers`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `id` (string): The unique episode ID.
+  - `provider` (string): The provider's ID (e.g., 'zoro').
+
+#### Example Request
+
+```bash
+curl "http://localhost:8080/servers?id=128549&provider=zoro"
+```
+
+#### Example Response
+
+```json
+{
+  "status": true,
+  "sub": [
+    {
+      "type": "sub",
+      "id": "1128585",
+      "serverId": "4",
+      "name": "HD-1"
+    },
+    {
+      "type": "sub",
+      "id": "1128581",
+      "serverId": "1",
+      "name": "HD-2"
+    }
+  ],
+  "dub": [
+    {
+      "type": "dub",
+      "id": "1128611",
+      "serverId": "4",
+      "name": "HD-1"
+    },
+    {
+      "type": "dub",
+      "id": "1128607",
+      "serverId": "1",
+      "name": "HD-2"
+    }
+  ],
+  "raw": []
+}
+```
+
+### Fetch Episodes
+
+- **Endpoint:** `/episodes`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `id` (string): The anime identifier.
+  - `provider` (string): The provider's ID (e.g., 'gogoanime', 'zoro', 'animepahe').
+
+#### Example Request
+
+```bash
+curl "http://localhost:8080/episodes?id=one-piece&provider=gogoanime"
+```
+
+#### Example Response
+
+```json
+{
+  "episodes": [
+    {
+      "episodeId": "one-piece-episode-1",
+      "episodeNumber": 1,
+      "title": "I'm Luffy! The Man Who's Gonna Be King of the Pirates!",
+      "url": "https://gogoanime.com/one-piece-episode-1"
+    }
+    // Additional episodes...
+  ]
+}
+```
+
+### Fetch Episode Servers
+
+- **Endpoint:** `/servers`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `id` (string): The unique episode ID.
+  - `provider` (string): The provider's ID (e.g., 'zoro').
+
+#### Example Request
+
+```bash
+curl "http://localhost:8080/servers?id=128549&provider=zoro"
+```
+
+#### Example Response
+
+```json
+{
+  "status": true,
+  "sub": [
+    {
+      "type": "sub",
+      "id": "1128585",
+      "serverId": "4",
+      "name": "HD-1"
+    },
+    {
+      "type": "sub",
+      "id": "1128581",
+      "serverId": "1",
+      "name": "HD-2"
+    }
+  ],
+  "dub": [
+    {
+      "type": "dub",
+      "id": "1128611",
+      "serverId": "4",
+      "name": "HD-1"
+    },
+    {
+      "type": "dub",
+      "id": "1128607",
+      "serverId": "1",
+      "name": "HD-2"
+    }
+  ],
+  "raw": []
+}
+```
+
+### Fetch Episodes
+
+- **Endpoint:** `/episodes`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `id` (string): The anime identifier.
+  - `provider` (string): The provider's ID (e.g., 'gogoanime', 'zoro', 'animepahe').
+
+#### Example Request
+
+```bash
+curl "http://localhost:8080/episodes?id=one-piece&provider=gogoanime"
+```
+
+#### Example Response
+
+```json
+{
+  "episodes": [
+    {
+      "episodeId": "one-piece-episode-1",
+      "episodeNumber": 1,
+      "title": "I'm Luffy! The Man Who's Gonna Be King of the Pirates!",
+      "url": "https://gogoanime.com/one-piece-episode-1"
+    }
+    // Additional episodes...
+  ]
+}
+```
+
+### Fetch Episode Servers
+
+- **Endpoint:** `/servers`
+- **Method:** `GET`
+- **Query Parameters:**
+  - `id` (string): The unique episode ID.
+  - `provider` (string): The provider's ID (e.g., 'zoro').
+
+#### Example Request
+
+```bash
+curl "http://localhost:8080/servers?id=128549&provider=zoro"
+```
+
+#### Example Response
+
+```json
+{
+  "status": true,
+  "sub": [
+    {
+      "type": "sub",
+      "id": "1128585",
+      "serverId": "4",
+      "name": "HD-1"
+    },
+    {
+      "type": "sub",
+      "id": "1128581",
+      "serverId": "1",
+      "name": "HD-2"
+    }
+  ],
+  "dub": [
+    {
+      "type": "dub",
+      "id": "1128611",
+      "serverId": "4",
+      "name": "HD-1"
+    },
+    {
+      "type": "dub",
+      "id": "1128607",
+      "serverId": "1",
+      "name": "HD-2"
+    }
+  ],
+  "raw": []
 }
 ```
 
@@ -254,11 +509,49 @@ curl "http://localhost:8080/info?id=21&provider=anilist"
 - **Description:** Retrieves streaming sources and download URLs for a specific episode from a chosen provider.
 
 - **Query Parameters:**
-  - `id` (string, required): The ID of the anime.
-  - `ep` (number, required): The episode number.
-  - `provider` (string, required): The provider's ID (e.g., `gogoanime`, `zoro`, `animepahe`).
+  - `id` (string): The unique server ID (e.g., from `/servers` response).
+  - `ep` (string): The episode identifier (can be any string for Zoro).
+  - `provider` (string): The provider's ID (e.g., `gogoanime`, `zoro`, `animepahe`).
 
-#### Example Request
+#### Example Request for Zoro
+
+```bash
+curl "http://localhost:8080/sources?id=1128585&ep=1&provider=zoro"
+```
+
+#### Example Response
+
+```json
+{
+  "sources": [
+    {
+      "url": "https://mmd.biananset.net/_v7/cd914ffc0cb17d4af1017fa6c1a9cd6d4db33887d1f03f2af365496646f8dfc442c671a686d1b459eb0ffe7b4b795eee172a232f946a2d93b3d5f0873c3137bbf632cfcb0602e96f3ad6ab9187dcb737b5449ba9ef6b2d870c3c4beadc4e0aac13d8d2b165de94c873794b42136609bf22e530c3887d0e336be062f224eb7e29/master.m3u8",
+      "type": "hls"
+    }
+  ],
+  "tracks": [
+    {
+      "file": "https://s.megastatics.com/subtitle/dc13e106ce815098ee70a00760ea916d/eng-2.vtt",
+      "label": "English",
+      "kind": "captions",
+      "default": true
+    }
+    // Additional tracks...
+  ],
+  "encrypted": false,
+  "intro": {
+    "start": 0,
+    "end": 89
+  },
+  "outro": {
+    "start": 1333,
+    "end": 1421
+  },
+  "server": 4
+}
+```
+
+#### Example Request for Gogoanime
 
 ```bash
 curl "http://localhost:8080/sources?id=one-piece&ep=1&provider=gogoanime"

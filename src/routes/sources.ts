@@ -1,8 +1,6 @@
 import express from "express";
 import { type Request, type Response } from "express";
-import { fetchSourcesGogo } from "../index";
-import { fetchSourcesPahe } from "../providers/animepahe/fetchSources";
-import { fetchSourcesZoro } from "../providers/zoro/fetchSources";
+import { fetchSourcesGogo, fetchSourcesPahe, fetchSourcesZoro } from "../index";
 
 const router = express.Router();
 

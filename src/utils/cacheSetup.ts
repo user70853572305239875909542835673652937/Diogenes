@@ -1,6 +1,6 @@
-import { createRedisCache } from "./cache";
+import { redisCache } from "./cache";
 
 /**
  * Initialize a Redis Cache instance
  */
-export const cache = createRedisCache<any>();
+export const cache = redisCache<any>();

@@ -38,7 +38,7 @@ redisClient.on("error", (err) =>
 /**
  * Create a Redis-based Cache
  */
-export const createRedisCache = <T>(): Cache<T> => ({
+export const redisCache = <T>(): Cache<T> => ({
   /**
    * Check if a key exists in Redis
    */

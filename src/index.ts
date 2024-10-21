@@ -1,4 +1,4 @@
-// Exporting from providers
+// * Exporting from providers
 export { fetchInfoGogo } from "./providers/gogoanime/fetchInfo";
 export { fetchSourcesGogo } from "./providers/gogoanime/fetchSources";
 export { gogoCDN } from "./providers/gogoanime/gogocdn";
@@ -17,14 +17,14 @@ export { infoQuery } from "./providers/anilist/queries";
 
 export { fetchMappings } from "./providers/malsync/fetchMappings";
 
-// Exporting from routes
+// * Exporting from routes
 export { default as infoRouter } from "./routes/info";
 export { default as episodesRouter } from "./routes/episodes";
 export { default as serversRouter } from "./routes/servers";
 export { default as sourcesRouter } from "./routes/sources";
 export { default as mappingsRouter } from "./routes/mappings";
 
-// Exporting from utils
+// * Exporting from utils
 export { cache } from "./utils/cacheSetup";
-export { createRedisCache } from "./utils/cache";
+export { redisCache } from "./utils/cache";
 export { default as logger } from "./utils/logger";
